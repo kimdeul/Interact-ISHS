@@ -1,13 +1,14 @@
 .header {
   width: 100%;
   background-color: var(--background-over);
+  box-shadow: 0 10px 0 var(--shadow);
+
+  margin-bottom: 10px;
   
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-
-  margin-bottom: 20px;
 }
 
 .header img {
