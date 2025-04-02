@@ -1,14 +1,6 @@
-type StudentID = `${
-    "1"|"2"|"3"
-  }${
-    "1"|"2"|"3"|"4"
-  }${
-    "0"|"1"|"2"
-  }${
-    "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
-  }`
+import { z } from "zod"
 
-export interface Student {
-  name: string;
-  id: StudentID;
-}
+export const Student = z.object({
+  name: z.string(),
+  id: z.string().regex(/[1-3][1-4][0-2][0-9]/)
+})
