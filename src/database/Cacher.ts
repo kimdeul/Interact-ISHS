@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "fs"
 import { join } from "path"
 
-export class Cacher {
+export class Cacher<T> {
 
   private readonly path: string
 
@@ -10,10 +10,10 @@ export class Cacher {
   }
 
   read() {
-    return JSON.parse(readFileSync(join(process.cwd(), this.path)).toString())
+    return JSON.parse(readFileSync(join(process.cwd(), this.path)).toString()) as T
   }
 
-  write(data: object) {
+  write(data: T) {
     writeFileSync(this.path, JSON.stringify(data))
   }
 
