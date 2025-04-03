@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
   const created = { students: query.data.students, date: query.data.date }
   const edited = cacher.read()
-  edited[`${query.data.date}`][query.data.time] = created
+  edited[`${query.data.room}`][query.data.time] = created
   cacher.write(edited)
   return NextResponse.json(created, { status: 201 })
 }
