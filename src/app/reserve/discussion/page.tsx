@@ -107,7 +107,9 @@ export default function PageReserveDiscussion() {
         date: new Date().toISOString(),
       }),
     })
-    if (!response.ok) alert("예약 양식이 올바르지 않습니다.\n회의실과 시간을 선택했는지, 학번과 이름이 모두 올바르게 입력되었는지 확인하세요.")
+    if (!response.ok) 
+      alert("예약 양식이 올바르지 않습니다.\n회의실과 시간을 선택했는지, 학번과 이름이 모두 올바르게 입력되었는지, 이미 예약되지 않았는지 확인하세요.")
+    else alert("예약이 완료되었습니다.")
   }
 
   return <>
