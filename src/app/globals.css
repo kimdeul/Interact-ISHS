@@ -1,7 +1,14 @@
 :root {
   --background: #f0f0f0;
   --background-over: #ffffff;
+  --background-over-opacity: #ffffff80;
+  --borderline: #cdcdcd;
   --foreground: #171717;
+  --title: #323232;
+  --subtitle: #898989;
+  --main-color: #6FB4F0;
+  --main-color-left: #88F3FF;
+  --main-color-right: #5675E2;
   --shadow: rgba(0, 0, 0, 0.1);
 }
 

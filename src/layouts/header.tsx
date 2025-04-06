@@ -11,7 +11,7 @@ export default function Header() {
       height={120}
       priority
     />
-    <p>예약 및 신청</p>
+    {/* <p>예약 및 신청</p> */}
   </header>
 
 }

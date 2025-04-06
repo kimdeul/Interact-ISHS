@@ -2,15 +2,17 @@
   width: 100%;
   background-color: var(--background-over);
   box-shadow: 0 10px 0 var(--shadow);
+  border-bottom: 2px solid var(--borderline);
 
   margin-bottom: 10px;
   
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  /* justify-content: space-between; */
 }
-
+/* 
 .header img {
   margin-left: 200px;
 }
@@ -18,4 +20,4 @@
 .header p {
   font-weight: 800;
   margin-right: 200px;
-}
+} */

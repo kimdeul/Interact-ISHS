@@ -1,0 +1,11 @@
+.subtitle {
+  width: 100%;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-align: left;
+  color: var(--subtitle);
+  border-bottom: 1px solid var(--borderline);
+  padding-bottom: 5px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
