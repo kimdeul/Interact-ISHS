@@ -21,6 +21,11 @@ function isToday(date: Date) {
     (date.getDay() === now.getDay())
 }
 
+function isAfter() {
+  const now = new Date()
+  return (now.getHours() >= 13) && (now.getMinutes() >= 20)
+}
+
 export async function GET(req: NextRequest) {
   const read = cacher.read()
   for (const i in read) for (const time of ["8", "1"] as const) read[i][time] = (
@@ -31,11 +36,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const query = DiscussionReserveScheme.safeParse(await req.json())
-  if (!query.success) return NextResponse.json(query.error.errors, { status: 400 })
+  if (!query.success) return NextResponse.json({ errors: "BAD_FORM", list: [query.error.errors] }, { status: 400 })
+  // TODO: 13시 20분 이후부터 예약
+  if (!isAfter()) return NextResponse.json({ errors: "TOO_EARLY" }, { status: 400 })
 
   const already = cacher.read()[query.data.room]?.[query.data.time]
   if (already && isToday(new Date(already.date)))
-    return NextResponse.json({ errors: "Reserve already exists."}, { status: 400 })
+    return NextResponse.json({ errors: "RESERVE_EXISTS" }, { status: 400 })
 
   const created = { students: query.data.students, date: query.data.date }
   const edited = cacher.read()

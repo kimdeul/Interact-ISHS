@@ -107,9 +107,12 @@ export default function PageReserveDiscussion() {
         date: new Date().toISOString(),
       }),
     })
-    if (!response.ok) 
-      alert("예약 양식이 올바르지 않습니다.\n회의실과 시간을 선택했는지, 학번과 이름이 모두 올바르게 입력되었는지, 이미 예약되지 않았는지 확인하세요.")
-    else alert("예약이 완료되었습니다.")
+    if (response.ok) return alert("예약이 완료되었습니다.")
+    const error = (await response.json()).errors
+    if (error === "BAD_FORM") return alert("예약 양식이 올바르지 않습니다.\n회의실과 시간을 선택했는지, 학번과 이름이 모두 올바르게 입력되었는지 확인하세요.")
+    if (error === "TOO_EARLY") return alert("예약은 13시 20분부터 가능합니다.")
+    if (error === "RESERVE_EXISTS") return alert("이미 예약이 존재하는 시간대입니다.")
+    return alert("알 수 없는 오류가 발생했습니다.")
   }
 
   return <>
