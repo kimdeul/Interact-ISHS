@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Student } from '../../_types/global'
  
-export const DiscussionReserveScheme = z.object({
+const DiscussionReserveScheme = z.object({
   room: z.number().int().min(1).max(5),
   students: z.array(Student).min(1),
   date: z.string().datetime(),

@@ -52,7 +52,7 @@
   .form button:hover {
     background-color: var(--main-color);
     border-color: var(--main-color);
-    color: var(--background);
+    color: var(--background-over);
   }
 }
 
