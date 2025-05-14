@@ -13,7 +13,7 @@ const DiscussionReserveScheme = z.object({
 type DiscussionReserve = Omit<z.infer<typeof DiscussionReserveScheme>, "room" | "time">
 export type DiscussionReserves<T = DiscussionReserve> = { [key: string]: { "8": T | null, "1": T | null } }
 
-const PATH = (__dirname.replace(/\.next(\\|\/)server/, "src") + "/data.json")
+const PATH = (process.cwd() + "/data/reserve/discussion.json")
 async function load(): Promise<DiscussionReserves> { return JSON.parse((await promises.readFile(PATH, "utf-8")).toString()) }
 async function save(data: DiscussionReserves): Promise<void> { await promises.writeFile(PATH, JSON.stringify(data)) }
 
