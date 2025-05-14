@@ -1,4 +1,4 @@
-import { Cacher } from '@/database/Cacher'
+import { promises } from 'fs'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Student } from '../../_types/global'
@@ -12,7 +12,10 @@ const DiscussionReserveScheme = z.object({
 
 type DiscussionReserve = Omit<z.infer<typeof DiscussionReserveScheme>, "room" | "time">
 export type DiscussionReserves<T = DiscussionReserve> = { [key: string]: { "8": T | null, "1": T | null } }
-const cacher = new Cacher<DiscussionReserves>("src/database/reserve/discussion.json")
+
+const PATH = (__dirname.replace(/\.next(\\|\/)server/, "src") + "/data.json")
+async function load(): Promise<DiscussionReserves> { return JSON.parse((await promises.readFile(PATH, "utf-8")).toString()) }
+async function save(data: DiscussionReserves): Promise<void> { await promises.writeFile(PATH, JSON.stringify(data)) }
 
 function isToday(date: Date) {
   const now = new Date()
@@ -27,7 +30,7 @@ function isAfter() {
 }
 
 export async function GET(req: NextRequest) {
-  const read = cacher.read()
+  const read = await load()
   for (const i in read) for (const time of ["8", "1"] as const) read[i][time] = (
     read[i][time] && isToday(new Date(read[i][time].date))
   ) ? read[i][time] : null
@@ -40,13 +43,13 @@ export async function POST(req: NextRequest) {
   // TODO: 13시 20분 이후부터 예약
   if (!isAfter()) return NextResponse.json({ errors: "TOO_EARLY" }, { status: 400 })
 
-  const already = cacher.read()[query.data.room]?.[query.data.time]
+  const already = (await load())[query.data.room]?.[query.data.time]
   if (already && isToday(new Date(already.date)))
     return NextResponse.json({ errors: "RESERVE_EXISTS" }, { status: 400 })
 
   const created = { students: query.data.students, date: query.data.date }
-  const edited = cacher.read()
+  const edited = await load()
   edited[`${query.data.room}`][query.data.time] = created
-  cacher.write(edited)
+  await save(edited)
   return NextResponse.json(created, { status: 201 })
 }
