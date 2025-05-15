@@ -1,4 +1,7 @@
+import { redirect } from "next/navigation"
+
 export default function Home() {
+  redirect("/reserve/discussion")
   return <>
     <br></br>
     <p>페이지가 공사중입니다... </p>
