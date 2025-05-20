@@ -26,7 +26,7 @@ function isToday(date: Date) {
 
 function isAfter() {
   const now = new Date()
-  return (now.getHours() >= 13) && (now.getMinutes() >= 20)
+  return (now.getHours() > 13) || (now.getHours() == 13 || now.getMinutes() >= 20)
 }
 
 export async function GET(req: NextRequest) {
