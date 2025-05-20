@@ -5,7 +5,7 @@ import { Student } from '../../_types/global'
  
 const DiscussionReserveScheme = z.object({
   room: z.number().int().min(1).max(5),
-  students: z.array(Student).min(1),
+  students: Student.array().min(2).max(6),
   date: z.string().datetime(),
   time: z.union([z.literal("8"), z.literal("1")])
 })
