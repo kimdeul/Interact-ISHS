@@ -19,10 +19,6 @@ const PATH = (process.cwd() + "/data/esports/match.json")
 async function load(): Promise<EsportsMatch[]> { return JSON.parse((await promises.readFile(PATH, "utf-8")).toString()) }
 async function save(data: EsportsMatch[]): Promise<void> { await promises.writeFile(PATH, JSON.stringify(data)) }
 
-export async function isStarted(index: number) {
-  return new Date() > new Date((await load())[index].date)
-}
-
 export async function GET(req: NextRequest) {
   const read = await load()
   return NextResponse.json(read, { status: 200 })

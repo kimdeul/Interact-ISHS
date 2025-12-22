@@ -2,7 +2,7 @@ import { promises } from 'fs'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Student } from '../../_types/global'
-import { isStarted } from '../match/route'
+import { EsportsMatch } from '../match/route'
  
 const PASSWORD = "25ishs!"
 
@@ -32,11 +32,12 @@ export async function POST(req: NextRequest) {
     && (query.data.password !== edited[query.data.student.id].password)
   ) return NextResponse.json({ errors: "PASSWORD_INCORRECT" }, { status: 400 })
 
+  const matches: EsportsMatch[] = (JSON.parse((await promises.readFile(PATH, "utf-8")).toString()))
   if (!!edited[query.data.student.id]) {
     const picks = edited[query.data.student.id].picks
     for (let i=0; i<picks.length; i++) {
       if (picks[i] === query.data.picks[i]) continue
-      if (await isStarted(i)) return NextResponse.json({ errors: "MATCH_STARTED" }, { status: 400 })
+      if (new Date() > new Date(matches[i].date)) return NextResponse.json({ errors: "MATCH_STARTED" }, { status: 400 })
     }
   }
 
