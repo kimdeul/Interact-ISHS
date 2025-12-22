@@ -1,0 +1,68 @@
+[
+  {
+    "name": "1학년부 정규 라운드 1경기",
+    "date": "2025-12-22T09:20:00.000Z",
+    "home": { "name": "1학년 3반", "score": null },
+    "away": { "name": "1학년 2반", "score": null }
+  },
+  {
+    "name": "1학년부 정규 라운드 2경기",
+    "date": "2025-12-23T03:50:00.000Z",
+    "home": { "name": "1학년 2반", "score": null },
+    "away": { "name": "1학년 4반", "score": null }
+  },
+  {
+    "name": "2학년부 1라운드 1경기",
+    "date": "2025-12-23T03:50:00.000Z",
+    "home": { "name": "2학년 2반", "score": null },
+    "away": { "name": "2학년 3반", "score": null }
+  },
+  {
+    "name": "2학년부 1라운드 2경기",
+    "date": "2025-12-23T07:40:00.000Z",
+    "home": { "name": "2학년 1반", "score": null },
+    "away": { "name": "2학년 4반", "score": null }
+  },
+  {
+    "name": "1학년부 정규 라운드 3경기",
+    "date": "2025-12-23T09:20:00.000Z",
+    "home": { "name": "1학년 4반", "score": null },
+    "away": { "name": "1학년 3반", "score": null }
+  },
+  {
+    "name": "2학년부 2라운드 승자전",
+    "date": "2025-12-23T08:20:00.000Z",
+    "home": { "name": "R1 1경기 승자", "score": null },
+    "away": { "name": "R1 2경기 승자", "score": null }
+  },
+  {
+    "name": "2학년부 2라운드 패자전",
+    "date": "2025-12-23T09:20:00.000Z",
+    "home": { "name": "R1 1경기 패자", "score": null },
+    "away": { "name": "R1 2경기 패자", "score": null }
+  },
+  {
+    "name": "1학년부 결승전",
+    "date": "2025-12-24T03:50:00.000Z",
+    "home": { "name": "정규 라운드 1위", "score": null },
+    "away": { "name": "정규 라운드 1위", "score": null }
+  },
+  {
+    "name": "2학년부 3라운드 결승 진출전",
+    "date": "2025-12-24T03:50:00.000Z",
+    "home": { "name": "승자조 패자", "score": null },
+    "away": { "name": "패자조 승자", "score": null }
+  },
+  {
+    "name": "2학년부 결승전",
+    "date": "2025-12-29T02:40:00.000Z",
+    "home": { "name": "　승자조 승자　", "score": null },
+    "away": { "name": "결승 진출전 승자", "score": null }
+  },
+  {
+    "name": "그랜드 파이널",
+    "date": "2025-12-29T10:10:00.000Z",
+    "home": { "name": "1학년부 우승팀", "score": null },
+    "away": { "name": "2학년부 우승팀", "score": null }
+  }
+]
