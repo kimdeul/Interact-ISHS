@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const picks = edited[query.data.student.id].picks
     for (let i=0; i<picks.length; i++) {
       if (picks[i] === query.data.picks[i]) continue
-      if (new Date() > new Date(matches[i].date)) return NextResponse.json({ errors: "MATCH_STARTED" }, { status: 400 })
+      if (new Date() > new Date(matches[i].date)) query.data.picks[i] = picks[i]
     }
   }
 
