@@ -63,7 +63,7 @@
   </div>
 </body>
 <script>
-  const PER = 0.01
+  const PER = 0.05
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const $ = document.getElementById.bind(document)
 const SelAtk = $("atk")
@@ -114,7 +114,7 @@ class gyeongminPokemon extends Pokemon { constructor(hp) {
   super(hp, { id: "gyeongmin", name: "경민몬", subject: "bio", hp: 180, skill: ["가속", "스키마 주입", "스플라이싱"]})}
   skill1(target) {target.getDamage(this, rand(10, 10))}
   skill2(target) {target.getDamage(this, rand(5, 18))}
-  skill3(target) {if (Math.random() < 0.5) target.getDamage(this, rand(25, 25))}
+  skill3(target) {if (Math.random() < 0.5) target?.getDamage(this, rand(25, 25))}
 } class jaegwonPokemon extends Pokemon { constructor(hp) {
   super(hp, { id: "jaegwon", name: "재권몬", subject: "bio", hp: 180, skill: ["맞잖아잉?", "별표. 시험.", "뭣이 중하다고..."]})}
   skill1(target) {this.getHeal(rand(12, 18))}
