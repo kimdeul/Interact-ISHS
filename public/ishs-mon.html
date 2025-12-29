@@ -447,7 +447,7 @@ async function game() {
   setInterval(() => {
     book(); 
     save()
-    if (Math.random() < PER) progress()
+    if (Math.random() < PER && !User.gaming) progress()
   }, 1000)
 }
 
