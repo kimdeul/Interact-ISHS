@@ -1,0 +1,464 @@
+<head>
+  <title>ISHSMon Go</title>
+  <link rel="stylesheet" href="./stylesheet.css">
+</head>
+<body>
+  <div id="start">
+    <div class="startas" id="startas1">1학년으로 시작</div>
+    <div class="startas" id="startas2">2학년으로 시작</div>
+  </div>
+  <div id="game" class="hidden">
+    <div id="finding">인곽몬을 찾고 있습니다...</div>
+    <div id="book">
+      <p>도감</p>
+      <div class="bookline">
+        <img class="shil" src="./gyeongmin.png">
+        <img class="shil" src="./injeong.png">
+        <img class="shil" src="./hyeonjun.png">
+        <img class="shil" src="./huijeong.png">
+        <img class="shil" src="./jihye.png">
+        <img class="shil" src="./hyeri.png">
+      </div>
+      <div class="bookline">
+        <img class="shil" src="./jaegwon.png">
+        <img class="shil" src="./yeonggyo.png">
+        <img class="shil" src="./yeonghun.png">
+        <img class="shil" src="./sujin.png">
+        <img class="shil" src="./jaeha.png">
+        <img class="shil" src="./yeongjae.png">
+      </div>
+    </div>
+  </div>
+  <div id="battle" class="hidden">
+    <img src="./gyeongmin.png" id="enemy">
+    <img src="./jaegwon.png" id="team">
+    <div id="enemy-hp">
+      <p id="enemy-hp-text">몬 10/150</p>
+      <div id="enemy-hp-bar"></div>
+    </div>
+    <div id="team-hp">
+      <p id="team-hp-text">몬 10/150</p>
+      <div id="team-hp-bar"></div>
+    </div>
+    <div id="frame">
+      <div id="dialogue">
+        <p id="text">몬은 무엇을 할까?</p>
+        <p id="sk1" class="hidden"></p>
+        <p id="sk2" class="hidden"></p>
+        <p id="sk3" class="hidden"></p>
+        <p id="potion" class="hidden">상처약</p>
+        <p id="fullheal" class="hidden">만병통치제</p>
+        <p id="pok1" class="hidden"></p>
+        <p id="pok2" class="hidden"></p>
+        <p id="pok3" class="hidden"></p>
+      </div>
+      <div id="sides">
+        <div class="selectable" id="atk">가르침</div>
+        <div class="selectable" id="pok">인곽몬</div>
+        <div class="selectable" id="bag">가　방</div>
+        <div class="selectable" id="get">포　획</div>
+        <div class="selectable" id="run">도　망</div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  const PER = 0.3 / 100
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const $ = document.getElementById.bind(document)
+const SelAtk = $("atk")
+const SelPok = $("pok")
+const SelBag = $("bag")
+const SelRun = $("run")
+const SelGet = $("get")
+const Text = $("text")
+const WeakAgainst={math:["lang","soc"],phy:["math","bio"],bio:["phy","geo"],chem:["math","phy"],geo:["chem","bio"],lang:["math","geo"],soc:["lang","bio"]}
+const StrongAgainst={math:["phy","chem"],phy:["geo","chem"],bio:["chem","soc"],chem:["bio","geo"],geo:["math","lang"],lang:["soc","bio"],soc:["math","phy"]};
+
+
+function rand(s, e) { return s + Math.floor(Math.random() * (e-s))}
+
+class Pokemon {
+  constructor(hp, option) {
+    this.option = option
+    this.status = {
+      hp: hp !== -1 ? hp : option.hp,
+      effect: {
+        stun: 0,
+        poison: 0
+      }
+    }
+  }
+
+  getDamage(cause, damage) {
+    const calcuated = damage 
+      * (WeakAgainst[cause.option.subject].includes(this.option.subject) ? 0.5 : 1.0)
+      * (StrongAgainst[cause.option.subject].includes(this.option.subject) ? 2.0 : 1.0)
+    this.status.hp -= calcuated
+    this.status.hp = Math.max(0, this.status.hp)
+  }
+
+  getHeal(amount) {
+    this.status.hp += amount
+    this.status.hp = Math.min(this.option.hp, this.status.hp)
+  }
+
+  getEffect(name, turn) {
+    this.effect[name] += turn
+  }
+}
+
+// 포켓몬
+
+class gyeongminPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "gyeongmin", name: "경민몬", subject: "bio", hp: 180, skill: ["가속", "스키마 주입", "스플라이싱"]})}
+  skill1(target) {target.getDamage(this, rand(10, 10))}
+  skill2(target) {target.getDamage(this, rand(5, 18))}
+  skill3(target) {if (Math.random() < 0.5) target.getDamage(this, rand(25, 25))}
+} class jaegwonPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "jaegwon", name: "재권몬", subject: "bio", hp: 180, skill: ["맞잖아잉?", "별표. 시험.", "뭣이 중하다고..."]})}
+  skill1(target) {this.getHeal(rand(12, 18))}
+  skill2(target) {target.getDamage(this, rand(12, 18))}
+  skill3(target) {target.getDamage(this, rand(8, 30))}
+} class yeonggyoPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "yeonggyo", name: "영교몬", subject: "chem", hp: 140, skill: ["천재야!", "시선을 마주치기 바랍니다", "주목!"]})}
+  skill1(target) {target.getDamage(this, rand(10, 15))}
+  skill2(target) {if (Math.random() < 0.9) target.getDamage(this, rand(15, 18))}
+  skill3(target) {if (Math.random() < 0.7) target.getEffect("stun", 1); target.getDamage(this.rand(5, 7))}
+} class injeongPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "injeong", name: "인정몬", subject: "phy", hp: 110, skill: ["인성교육", "회복적 생활지도", ""]})}
+  skill1(target) {target.getDamage(this, rand(20, 25))}
+  skill2(target) {if (Math.random() < 0.7) target.getEffect("poison", 1); target.getDamage(this.rand(5, 7))}
+  skill3(target) {}
+} class hyeonjunPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "hyeonjun", name: "현준몬", subject: "geo", hp: 170, skill: ["쇠똥구리", "택배상자", "번데기의 최후"]})}
+  skill1(target) {this.getHeal(rand(15, 16))}
+  skill2(target) {target.getDamage(this, rand(17, 24))}
+  skill3(target) {target.getDamage(this, rand(0, 40))}
+} class yeonghunPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "yeonghun", name: "영훈몬", subject: "phy", hp: 180, skill: ["프사이~", "그렇지!", "기말 이벤트"]})}
+  skill1(target) {if (Math.random() < 0.8) target.getDamage(this, rand(10, 20))}
+  skill2(target) {if (Math.random() < 0.5) target.getDamage(this, rand(20, 30))}
+  skill3(target) {if (Math.random() < 0.1) target.getDamage(this, rand(60, 70))}
+} class huijeongPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "huijeong", name: "희정몬", subject: "lang", hp: 150, skill: ["전자기기 압수", "간식 압수", "안돼."]})}
+  skill1(target) {if (Math.random() < 0.3) target.getEffect("stun", 1);target.getDamage(this, rand(15,15))}
+  skill2(target) {if (Math.random() < 0.3) target.getEffect("stun", 1);target.getDamage(this, rand(10,20))}
+  skill3(target) {if (Math.random() < 0.3) target.getEffect("stun", 1);target.getDamage(this, rand(0,40))}
+} class sujinPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "sujin", name: "수진몬", subject: "lang", hp: 120, skill: ["어머어머", "랩탑 집어넣을까요~", "자스민 출동"]})}
+  skill1(target) {target.getDamage(this, rand(10,15))}
+  skill2(target) {if (Math.random() < 0.9) target.getEffect("stun", 1)}
+  skill3(target) {if (Math.random() < 1) target.getEffect("poison", 1);target.getDamage(this, rand(0,20))}
+} class jihyePokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "jihye", name: "지혜몬", subject: "soc", hp: 130, skill: ["양괄호 1번", "맞나?", "지혜의 샘"]})}
+  skill1(target) {target.getDamage(this, rand(10,15))}
+  skill2(target) {if (Math.random() < 0.8) target.getDamage(this, rand(0, 70))}
+  skill3(target) {this.getHeal(rand(0, 80))}
+} class hyeriPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "hyeri", name: "혜리몬", subject: "chem", hp: 100, skill: ["숙제 다 했죠?", "칼퇴", "이해 되셨죠 여러분들?"]})}
+  skill1(target) {target.getDamage(this, rand(10,18))}
+  skill2(target) {target.getDamage(this, rand(30,30))}
+  skill3(target) {if (Math.random() < 0.4) target.getEffect("stun", 1);target.getDamage(this, rand(0,20))}
+} class jaehaPokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "jaeha", name: "재하몬", subject: "math", hp: 160, skill: ["등산", "꼭짓점", "이렇게 하면 되겠다!"]})}
+  skill1(target) {this.getHeal(rand(0,40));target.getDamage(this, rand(0, 40))}
+  skill2(target) {if (Math.random() < 0.4) target.getEffect("stun", 1); target.getDamage(this, rand(30,30))}
+  skill3(target) {target.getDamage(this, rand(0,80))}
+} class yeongjaePokemon extends Pokemon { constructor(hp) {
+  super(hp, { id: "yeongjae", name: "영재몬", subject: "math", hp: 210, skill: ["왕에프엑스", "위고비", "어우 힘들어"]})}
+  skill1(target) {target.getDamage(this, rand(0, 30))}
+  skill2(target) {if (Math.random() < 0.3) target.getDamage(this, rand(40, 100))}
+  skill3(target) {if (Math.random() < 1) target.getEffect("poison", 1)}
+}
+
+
+
+
+
+
+// 글로벌변수및유저변수
+
+const Global = {
+  pokemons: [
+    new gyeongminPokemon(-1),
+    new jaegwonPokemon(-1),
+    new yeonggyoPokemon(-1),
+    new injeongPokemon(-1),
+    new hyeonjunPokemon(-1),
+    new yeonghunPokemon(-1),
+    new huijeongPokemon(-1),
+    new sujinPokemon(-1),
+    new jihyePokemon(-1),
+    new hyeriPokemon(-1),
+    new jaehaPokemon(-1),
+    new yeongjaePokemon(-1),
+  ]
+}
+
+let Pokemons = []
+let User = {
+  enemy: null,
+  myturn: false,
+  selected: 0,
+  potion: 5,
+  pokeballs: 5,
+  fullheal: 0,
+  ready: [0, 0, 0],
+  // 1 atk 2 pok 3 bag 4 run, index 
+  act: [0, 0],
+  surrender: false,
+  gotcha: false,
+  gaming: false,
+}
+
+
+// 전투 리스너
+function clearDialogue() {
+  ["sk1","sk2","sk3","potion","fullheal","pok1","pok2","pok3","text"].forEach(key => $(key).classList.add("hidden"))
+}
+SelAtk.addEventListener("click", () => {
+  if (!User.myturn) return 
+  clearDialogue(); 
+  $("sk1").innerText=(Pokemons[User.selected].option.skill[0])
+  $("sk2").innerText=(Pokemons[User.selected].option.skill[1])
+  $("sk3").innerText=(Pokemons[User.selected].option.skill[2])
+  $("sk1").classList.remove("hidden")
+  $("sk2").classList.remove("hidden")
+  $("sk3").classList.remove("hidden")
+})
+SelPok.addEventListener("click", () => {
+  if (!User.myturn) return
+  clearDialogue(); 
+  User.ready=[rand(0,Pokemons.length), rand(0,Pokemons.length), rand(0,Pokemons.length)]
+  $("pok1").innerText=(Pokemons[User.ready[0]].option.name)
+  $("pok2").innerText=(Pokemons[User.ready[1]].option.name)
+  $("pok3").innerText=(Pokemons[User.ready[2]].option.name)
+  $("pok1").classList.remove("hidden")
+  $("pok2").classList.remove("hidden")
+  $("pok3").classList.remove("hidden")
+})
+SelBag.addEventListener("click", () => {
+  if (!User.myturn) return
+  clearDialogue()
+  if (User.potion) $("potion").classList.remove("hidden")
+  if (User.fullheal) $("fullheal").classList.remove("hidden")
+  if (!User.potion && !User.fullheal) {
+    $("text").classList.remove("hidden")
+    $("text").innerText = "아이템이 모두 떨어졌다..."
+  }
+})
+$("sk1").addEventListener("click", () => User.act=[1,0])
+$("sk2").addEventListener("click", () => User.act=[1,1])
+$("sk3").addEventListener("click", () => User.act=[1,2])
+$("pok1").addEventListener("click", () => User.act=[2,0])
+$("pok2").addEventListener("click", () => User.act=[2,1])
+$("pok3").addEventListener("click", () => User.act=[2,2])
+$("potion").addEventListener("click", () => User.act=[3,0])
+$("fullheal").addEventListener("click", () => User.act=[3,1])
+$("run").addEventListener("click", () => User.act=[4,0])
+$("get").addEventListener("click", () => { 
+  if (!User.pokeballs) return;
+  User.act=[5,0] 
+})
+
+
+// 턴
+function teamBotTurn() {
+  console.log("Team Turn")
+  User.myturn = true
+  const team = Pokemons[User.selected]
+  if (team.status.effect.poison) team.getDamage(User.enemy, 10)
+  clearDialogue()
+  $("text").classList.remove("hidden")
+  $("text").innerText = `${team.option.name}은 무엇을 할까?`
+  return new Promise(res => {
+    const check = setInterval(() => {
+      if (!User.act[0]) return
+      User.myturn = false
+      clearInterval(check)
+      $("team").classList.add("shake")
+      clearDialogue()
+
+      if (User.act[0] === 1) {
+        $("text").classList.remove("hidden")
+        $("text").innerText = `${team.option.name}의 ${team.option.skill[User.act[1]]}!`
+        if (WeakAgainst[team.option.subject].includes(User.enemy.option.subject)) $("text").innerText += `\n효과가 별로인 것 같다...`
+        if (StrongAgainst[team.option.subject].includes(User.enemy.option.subject)) $("text").innerText += `\n효과가 굉장하다!`
+        team[`skill${User.act[1] + 1}`](User.enemy)
+      } if (User.act[0] === 3) {
+        $("text").classList.remove("hidden")
+        $("text").innerText = `${team.option.name}은 ${User.act[1] ? "만병통치제" : "상처약"}을 사용했다!`
+        if (!User.act[1]) { team.getHeal(35); User.potion--; }
+        else { User.fullheal--; for (let key in team.status.effect) team.status.effect[key] = 0}
+        // 상태이상제거
+      } if (User.act[0] === 2) {
+        const newmon = User.ready[User.act[1]]
+        $("text").classList.remove("hidden")
+        $("text").innerText = `너로 정했다, ${Pokemons[newmon].option.name}!`
+        User.selected = newmon
+      } if (User.act[0] === 4) {
+        $("text").classList.remove("hidden")
+        $("text").innerText = `${team.option.name}은 도망쳤다...`
+        User.surrender = true
+      }  if (User.act[0] === 5) {
+        // 포획
+        User.pokeballs--;
+        $("text").classList.remove("hidden")
+        console.log( User.enemy.status.hp/User.enemy.option.hp)
+        if (Math.random() < 1-User.enemy.status.hp/User.enemy.option.hp) {
+          $("text").innerText = `${User.enemy.option.name}, 넌 내거야!`
+          User.gotcha = true;
+          Pokemons.push(User.enemy)
+        }
+        else $("text").innerText = `포획에 실패했다...`
+      }
+      User.act = [0,0]
+      setTimeout(() => {
+        $("team").classList.remove("shake")
+        res()
+      }, 500)
+    }, 100)
+  })
+}
+
+function enemyBotTurn() {
+  console.log("Bot TUrn")
+  const team = Pokemons[User.selected]
+  if (User.enemy.status.effect.poison) User.enemy.getDamage(team, 10)
+  return new Promise(res => {
+    const skill = rand(1,  4)
+    User.enemy[`skill${skill}`](Pokemons[User.selected])
+    $("enemy").classList.add("shake")
+    clearDialogue()
+    $("text").classList.remove("hidden")
+    $("text").innerText = `${User.enemy.option.name}의 ${User.enemy.option.skill[skill-1]}!`
+    if (WeakAgainst[User.enemy.option.subject].includes(team.option.subject)) $("text").innerText += `\n효과가 별로인 것 같다...`
+    if (StrongAgainst[User.enemy.option.subject].includes(team.option.subject)) $("text").innerText += `\n효과가 굉장하다!`
+    setTimeout(() => {
+      $("enemy").classList.remove("shake")
+      res()
+    }, 500)
+  })
+}
+
+function updatehp() {
+  const team = Pokemons[User.selected]
+  const enemy = User.enemy
+  const teamper = (team.status.hp/team.option.hp*100).toFixed(0)
+  const enemyper = (enemy.status.hp/enemy.option.hp*100).toFixed(0)
+  $("team").src = `./${team.option.id}.png`
+  $("enemy").src = `./${enemy.option.id}.png`
+  $("team-hp-text").innerText = `${team.option.name} ${team.status.hp}/${team.option.hp} ${team.status.effect.stun ? "기절" : ""} ${team.status.effect.poison ? "화상" : ""}`
+  $("team-hp-bar").style.background = `linear-gradient(to right, #f00 ${teamper}%, #999 ${teamper}%)`
+  $("enemy-hp-text").innerText = `${enemy.option.name} ${enemy.status.hp}/${enemy.option.hp} ${enemy.status.effect.stun ? "기절" : ""} ${enemy.status.effect.poison ? "화상" : ""}`
+  $("enemy-hp-bar").style.background = `linear-gradient(to right, #f00 ${enemyper}%, #999 ${enemyper}%)`
+}
+
+async function progress() {
+  User.gaming = true
+  $("game").classList.add('hidden')
+  $("battle").classList.remove('hidden')
+  User.enemy = Global.pokemons.filter(mon => !Pokemons.map(m => m.option.name).includes(mon.option.name)).sort(() => Math.random() - 0.5)[0]
+  updatehp()
+  clearDialogue()  
+  $("text").classList.remove("hidden")
+  $("text").innerText = `야생의 ${User.enemy.option.name}이 나타났다!`
+  await sleep(1500)
+  const team = Pokemons[User.selected]
+  while (true) {
+    updatehp()
+    if (!team.status.effect.stun) {
+      await teamBotTurn()
+      updatehp()
+      for (let key in team.status.effect) {
+        if (team.status.effect[key]) team.status.effect[key]--
+      }
+      await sleep(1500)
+    }
+    
+    if (User.gotcha) {
+      break
+    }
+
+    if (User.surrender) {
+      clearDialogue()  
+      $("text").classList.remove("hidden")
+      $("text").innerText = `${team.option.name}은 도망쳤다...`
+      break
+    }
+  
+    if (User.enemy.status.hp > 0 && !User.enemy.status.effect.stun) {
+      await enemyBotTurn()
+      updatehp()
+      for (let key in User.enemy.status.effect) {
+        if (User.enemy.status.effect[key]) User.enemy.status.effect[key]--
+      }
+      await sleep(1500)
+    }
+    if (User.enemy.status.hp <= 0) {
+      clearDialogue()  
+      $("text").classList.remove("hidden")
+      $("text").innerText = `${User.enemy.option.name}은 도망쳤다...`
+      break
+    }
+    if (team.status.hp <= 0) {
+      const available = Pokemons.filter(mon => mon.status.hp > 0)
+      console.log(available)
+      if (!available.length) {  
+        $("text").classList.remove("hidden")
+        $("text").innerText = `더 이상 사용할 수 있는 포켓몬이 없다...`
+        break
+      }      
+      const newmon = available[0]
+      $("text").classList.remove("hidden")
+      $("text").innerText = `너로 정했다, ${Pokemons[newmon].option.name}!`
+      User.selected = newmon
+    }
+  }
+  await sleep(1000)
+  $("battle").classList.add('hidden')
+  $("game").classList.remove('hidden')
+  User.surrender = false
+  User.gotcha = false
+  User.gaming = false
+}
+
+// progress()
+
+$("startas1").addEventListener("click", () => { Pokemons.push(new gyeongminPokemon(-1)); game() })
+$("startas2").addEventListener("click", () => { Pokemons.push(new jaegwonPokemon(-1)); game() })
+if (localStorage["user"]) {
+  load()
+  game()
+}
+
+  // 도감
+function book () {[...document.querySelectorAll('.shil')].map(el => {
+  if (Pokemons.map(poke => `${poke.option.id}.png`).includes(el.src.slice(el.src.lastIndexOf("/")+1))) el.classList.remove("darkshil")
+  else el.classList.add("darkshil")
+})}
+
+book()
+async function game() {
+  save()
+  $("game").classList.remove("hidden")
+  $("start").classList.add("hidden")
+  setInterval(() => {
+    book(); 
+    save()
+    if (Math.random() < PER) progress()
+  }, 1000)
+}
+
+// 세이브
+function save() {
+  localStorage["user"] = JSON.stringify(User)
+  localStorage["pokemons"] = JSON.stringify(Pokemons.map(mon => [mon.option.id, mon.status.hp]))
+}
+function load() {
+  console.log(localStorage)
+  User = JSON.parse(localStorage["user"])
+  Pokemons = JSON.parse(localStorage["pokemons"]).map(([id, hp]) => eval(`new ${id}Pokemon(${hp})`))
+}
+</script>
