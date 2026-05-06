@@ -1,7 +1,8 @@
 import { promises } from 'fs'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { Student } from '../../_types/global'
+import { Reserves, Student } from '../../_types/global'
+import { isAfter, isToday } from '../../_utilities/times'
  
 const DiscussionReserveScheme = z.object({
   room: z.number().int().min(1).max(5),
@@ -11,23 +12,11 @@ const DiscussionReserveScheme = z.object({
 })
 
 type DiscussionReserve = Omit<z.infer<typeof DiscussionReserveScheme>, "room" | "time">
-export type DiscussionReserves<T = DiscussionReserve> = { [key: string]: { "8": T | null, "1": T | null } }
+export type DiscussionReserves<T = DiscussionReserve> = Reserves<T>
 
 const PATH = (process.cwd() + "/data/reserve/discussion.json")
 async function load(): Promise<DiscussionReserves> { return JSON.parse((await promises.readFile(PATH, "utf-8")).toString()) }
 async function save(data: DiscussionReserves): Promise<void> { await promises.writeFile(PATH, JSON.stringify(data)) }
-
-function isToday(date: Date) {
-  const now = new Date()
-  return (date.getFullYear() === now.getFullYear()) &&
-    (date.getMonth() === now.getMonth()) &&
-    (date.getDay() === now.getDay())
-}
-
-function isAfter() {
-  const now = new Date()
-  return (now.getHours() > 13) || (now.getHours() == 13 || now.getMinutes() >= 20)
-}
 
 export async function GET(req: NextRequest) {
   const read = await load()
@@ -40,7 +29,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const query = DiscussionReserveScheme.safeParse(await req.json())
   if (!query.success) return NextResponse.json({ errors: "BAD_FORM", list: [query.error.errors] }, { status: 400 })
-  // TODO: 13시 20분 이후부터 예약
+
   if (!isAfter()) return NextResponse.json({ errors: "TOO_EARLY" }, { status: 400 })
 
   const already = (await load())[query.data.room]?.[query.data.time]
